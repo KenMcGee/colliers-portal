@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colliers Denver Design Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark">C</div>
+        <div class="logo-text">
+          <span class="logo-title">Colliers</span>
+          <span class="logo-sub">Denver Design Studio</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Tools</div>
+        <a href="#" class="nav-item active" data-page="dashboard">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="#" class="nav-item" data-page="om-builder">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          OM / BOV Builder
+        </a>
+        <a href="#" class="nav-item coming-soon" data-page="map-generator">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+          Map Generator
+          <span class="badge-soon">Soon</span>
+        </a>
+        <a href="#" class="nav-item coming-soon" data-page="brochure">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          Brochure Builder
+          <span class="badge-soon">Soon</span>
+        </a>
+        <div class="nav-section-label" style="margin-top:24px;">Account</div>
+        <a href="#" class="nav-item" data-page="settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-text">Colliers International<br>Denver, Colorado</div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+
+      <!-- Dashboard page -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h1>Dashboard</h1>
+            <p class="page-subtitle">Recent projects and quick actions</p>
+          </div>
+          <button class="btn-primary" onclick="navigate('om-builder')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Document
+          </button>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Documents created</div>
+            <div class="stat-value" id="stat-docs">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Saved properties</div>
+            <div class="stat-value" id="stat-props">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">This month</div>
+            <div class="stat-value" id="stat-month">0</div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <h2>Recent Projects</h2>
+        </div>
+
+        <div id="recent-projects-list">
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <p>No projects yet. Create your first OM or BOV to get started.</p>
+            <button class="btn-primary" onclick="navigate('om-builder')">Create Document</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OM/BOV Builder page -->
+      <div class="page" id="page-om-builder">
+        <div class="page-header">
+          <div>
+            <h1>OM / BOV Builder</h1>
+            <p class="page-subtitle">Build professional offering memoranda and broker opinions of value</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn-secondary" id="btn-save-draft" onclick="saveDraft()">Save Draft</button>
+            <button class="btn-primary" id="btn-generate" onclick="generateDocument()">Generate Document</button>
+          </div>
+        </div>
+
+        <!-- Step indicator -->
+        <div class="steps-bar">
+          <div class="step active" data-step="1">
+            <div class="step-num">1</div>
+            <div class="step-label">Document Type</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="2">
+            <div class="step-num">2</div>
+            <div class="step-label">Property Info</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="3">
+            <div class="step-num">3</div>
+            <div class="step-label">Financials</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="4">
+            <div class="step-num">4</div>
+            <div class="step-label">Upload Files</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="5">
+            <div class="step-num">5</div>
+            <div class="step-label">Review & Generate</div>
+          </div>
+        </div>
+
+        <!-- Step panels -->
+        <div class="step-panels">
+
+          <!-- Step 1: Document Type -->
+          <div class="step-panel active" id="step-panel-1">
+            <div class="panel-card">
+              <h3>What type of document are you creating?</h3>
+              <div class="doc-type-grid">
+                <div class="doc-type-card active" data-type="om" onclick="selectDocType('om')">
+                  <div class="doc-type-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  </div>
+                  <div class="doc-type-name">Offering Memorandum</div>
+                  <div class="doc-type-desc">Full marketing package for a property listing. Includes executive summary, property details, financials, and market overview.</div>
+                  <div class="doc-type-sections">Typical sections: 8–12 pages</div>
+                </div>
+                <div class="doc-type-card" data-type="bov" onclick="selectDocType('bov')">
+                  <div class="doc-type-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  </div>
+                  <div class="doc-type-name">Broker Opinion of Value</div>
+                  <div class="doc-type-desc">Valuation analysis for a client. Includes comparable sales, income approach, and pricing recommendation.</div>
+                  <div class="doc-type-sections">Typical sections: 5–8 pages</div>
+                </div>
+              </div>
+
+              <h3 style="margin-top:32px;">Property Type</h3>
+              <div class="prop-type-grid">
+                <div class="prop-type-btn active" data-ptype="industrial" onclick="selectPropType('industrial')">Industrial / Flex</div>
+                <div class="prop-type-btn" data-ptype="office" onclick="selectPropType('office')">Office</div>
+                <div class="prop-type-btn" data-ptype="retail" onclick="selectPropType('retail')">Retail / Mixed-Use</div>
+                <div class="prop-type-btn" data-ptype="multifamily" onclick="selectPropType('multifamily')">Multifamily</div>
+              </div>
+
+              <div class="step-nav">
+                <div></div>
+                <button class="btn-primary" onclick="goStep(2)">Next: Property Info →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Property Info -->
+          <div class="step-panel" id="step-panel-2">
+            <div class="panel-card">
+              <h3>Property Information</h3>
+              <div class="form-grid">
+                <div class="form-group full">
+                  <label>Property Name / Title</label>
+                  <input type="text" id="prop-name" placeholder="e.g. Interlocken Commerce Center" />
+                </div>
+                <div class="form-group full">
+                  <label>Street Address</label>
+                  <input type="text" id="prop-address" placeholder="e.g. 2655 W. Midway Blvd" />
+                </div>
+                <div class="form-group">
+                  <label>City</label>
+                  <input type="text" id="prop-city" placeholder="Broomfield" />
+                </div>
+                <div class="form-group">
+                  <label>State</label>
+                  <input type="text" id="prop-state" placeholder="CO" />
+                </div>
+                <div class="form-group">
+                  <label>ZIP Code</label>
+                  <input type="text" id="prop-zip" placeholder="80020" />
+                </div>
+                <div class="form-group">
+                  <label>County</label>
+                  <input type="text" id="prop-county" placeholder="Broomfield County" />
+                </div>
+                <div class="form-group">
+                  <label>Year Built</label>
+                  <input type="number" id="prop-year" placeholder="2005" />
+                </div>
+                <div class="form-group">
+                  <label>Total Building SF</label>
+                  <input type="number" id="prop-sf" placeholder="45000" />
+                </div>
+                <div class="form-group">
+                  <label>Lot Size (Acres)</label>
+                  <input type="number" id="prop-acres" placeholder="3.2" step="0.01" />
+                </div>
+                <div class="form-group">
+                  <label>Number of Buildings</label>
+                  <input type="number" id="prop-buildings" placeholder="1" />
+                </div>
+                <div class="form-group">
+                  <label>Number of Suites / Units</label>
+                  <input type="number" id="prop-units" placeholder="4" />
+                </div>
+                <div class="form-group">
+                  <label>Zoning</label>
+                  <input type="text" id="prop-zoning" placeholder="I-2 Light Industrial" />
+                </div>
+                <div class="form-group">
+                  <label>Parking Spaces</label>
+                  <input type="number" id="prop-parking" placeholder="120" />
+                </div>
+                <div class="form-group">
+                  <label>Clear Height (ft) — Industrial</label>
+                  <input type="number" id="prop-clearheight" placeholder="24" />
+                </div>
+                <div class="form-group full">
+                  <label>Brief Property Description</label>
+                  <textarea id="prop-desc" rows="4" placeholder="Describe the property — construction type, key features, recent improvements, condition, etc."></textarea>
+                </div>
+                <div class="form-group full">
+                  <label>Investment Highlights (one per line)</label>
+                  <textarea id="prop-highlights" rows="4" placeholder="100% leased to credit tenants&#10;Recent roof replacement (2022)&#10;Below-market rents with upside&#10;Easy I-25 access"></textarea>
+                </div>
+              </div>
+
+              <h3 style="margin-top:28px;">Broker Information</h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Broker Name</label>
+                  <input type="text" id="broker-name" placeholder="John Smith" />
+                </div>
+                <div class="form-group">
+                  <label>Title</label>
+                  <input type="text" id="broker-title" placeholder="Senior Vice President" />
+                </div>
+                <div class="form-group">
+                  <label>Phone</label>
+                  <input type="text" id="broker-phone" placeholder="(303) 555-0100" />
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" id="broker-email" placeholder="jsmith@colliers.com" />
+                </div>
+                <div class="form-group">
+                  <label>License Number</label>
+                  <input type="text" id="broker-license" placeholder="CO EA.100012345" />
+                </div>
+              </div>
+
+              <div class="step-nav">
+                <button class="btn-secondary" onclick="goStep(1)">← Back</button>
+                <button class="btn-primary" onclick="goStep(3)">Next: Financials →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Financials -->
+          <div class="step-panel" id="step-panel-3">
+            <div class="panel-card">
+              <h3>Pricing & Financial Summary</h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Asking Price ($)</label>
+                  <input type="number" id="fin-price" placeholder="6500000" oninput="calcFinancials()" />
+                </div>
+                <div class="form-group">
+                  <label>Price Per SF ($)</label>
+                  <input type="number" id="fin-ppsf" placeholder="144.44" step="0.01" oninput="calcFinancials()" />
+                </div>
+                <div class="form-group">
+                  <label>Gross Potential Rent (Annual $)</label>
+                  <input type="number" id="fin-gpr" placeholder="520000" oninput="calcFinancials()" />
+                </div>
+                <div class="form-group">
+                  <label>Vacancy Allowance (%)</label>
+                  <input type="number" id="fin-vacancy" placeholder="5" step="0.1" oninput="calcFinancials()" />
+                </div>
+                <div class="form-group">
+                  <label>Effective Gross Income ($)</label>
+                  <input type="number" id="fin-egi" placeholder="" oninput="calcFinancials()" />
+                </div>
+                <div class="form-group">
+                  <label>Operating Expenses ($)</label>
+                  <input type="number" id="fin-opex" placeholder="104000" oninput="calcFinancials()" />
+                </div>
+                <div class="form-group">
+                  <label>Net Operating Income ($)</label>
+                  <input type="number" id="fin-noi" placeholder="" oninput="calcFinancials()" />
+                </div>
+                <div class="form-group">
+                  <label>Cap Rate (%)</label>
+                  <input type="number" id="fin-caprate" placeholder="" step="0.01" oninput="calcFinancials()" />
+                </div>
+                <div class="form-group">
+                  <label>Current Occupancy (%)</label>
+                  <input type="number" id="fin-occupancy" placeholder="100" step="0.1" oninput="calcFinancials()" />
+                </div>
+                <div class="form-group">
+                  <label>WALT (Years)</label>
+                  <input type="number" id="fin-walt" placeholder="4.2" step="0.1" />
+                </div>
+              </div>
+
+              <!-- Auto-calc display -->
+              <div class="calc-results" id="calc-results">
+                <div class="calc-result-item">
+                  <span class="calc-label">Price / SF</span>
+                  <span class="calc-value" id="calc-ppsf">—</span>
+                </div>
+                <div class="calc-result-item">
+                  <span class="calc-label">NOI</span>
+                  <span class="calc-value" id="calc-noi">—</span>
+                </div>
+                <div class="calc-result-item">
+                  <span class="calc-label">Cap Rate</span>
+                  <span class="calc-value" id="calc-caprate">—</span>
+                </div>
+                <div class="calc-result-item">
+                  <span class="calc-label">GRM</span>
+                  <span class="calc-value" id="calc-grm">—</span>
+                </div>
+              </div>
+
+              <h3 style="margin-top:32px;">Rent Roll Summary</h3>
+              <p class="field-hint">Add tenants manually, or upload a rent roll file in Step 4 to auto-populate.</p>
+              <div class="rent-roll-table-wrap">
+                <table class="rent-roll-table" id="rent-roll-table">
+                  <thead>
+                    <tr>
+                      <th>Tenant Name</th>
+                      <th>Suite</th>
+                      <th>SF</th>
+                      <th>Lease Start</th>
+                      <th>Lease End</th>
+                      <th>Annual Rent</th>
+                      <th>Rent/SF</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="rent-roll-body">
+                    <tr class="empty-row"><td colspan="8" style="text-align:center;color:#6b7fa3;padding:20px;">No tenants added yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <button class="btn-secondary" style="margin-top:10px;" onclick="addTenantRow()">+ Add Tenant</button>
+
+              <div class="step-nav">
+                <button class="btn-secondary" onclick="goStep(2)">← Back</button>
+                <button class="btn-primary" onclick="goStep(4)">Next: Upload Files →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Upload Files -->
+          <div class="step-panel" id="step-panel-4">
+            <div class="panel-card">
+              <h3>Upload Supporting Files</h3>
+              <p class="field-hint">Upload files to have the AI extract and populate financial data, narrative content, and property details automatically.</p>
+
+              <div class="upload-grid">
+                <div class="upload-zone" id="upload-financials" onclick="triggerUpload('financials')">
+                  <input type="file" id="file-financials" style="display:none" accept=".xlsx,.xls,.csv" onchange="handleFileUpload('financials', this)" multiple />
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  <div class="upload-label">Financial Documents</div>
+                  <div class="upload-hint">Rent roll, P&L, T12 (.xlsx, .csv)</div>
+                  <div class="upload-files-list" id="files-financials"></div>
+                </div>
+
+                <div class="upload-zone" id="upload-narrative" onclick="triggerUpload('narrative')">
+                  <input type="file" id="file-narrative" style="display:none" accept=".pdf,.docx,.doc,.txt" onchange="handleFileUpload('narrative', this)" multiple />
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                  <div class="upload-label">Property Narrative</div>
+                  <div class="upload-hint">Descriptions, marketing copy (.pdf, .docx)</div>
+                  <div class="upload-files-list" id="files-narrative"></div>
+                </div>
+
+                <div class="upload-zone" id="upload-photos" onclick="triggerUpload('photos')">
+                  <input type="file" id="file-photos" style="display:none" accept=".jpg,.jpeg,.png,.webp" onchange="handleFileUpload('photos', this)" multiple />
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <div class="upload-label">Property Photos</div>
+                  <div class="upload-hint">Exterior, interior, aerials (.jpg, .png)</div>
+                  <div class="upload-files-list" id="files-photos"></div>
+                </div>
+
+                <div class="upload-zone" id="upload-template" onclick="triggerUpload('template')">
+                  <input type="file" id="file-template" style="display:none" accept=".pdf,.pptx,.docx" onchange="handleFileUpload('template', this)" />
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                  <div class="upload-label">Design Template</div>
+                  <div class="upload-hint">Reference layout (.pdf, .pptx)</div>
+                  <div class="upload-files-list" id="files-template"></div>
+                </div>
+              </div>
+
+              <div class="api-key-section">
+                <h3>Claude API Key</h3>
+                <p class="field-hint">Required to use AI features — narrative generation, file parsing, and financial extraction.</p>
+                <div class="api-key-row">
+                  <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." style="flex:1;" />
+                  <button class="btn-secondary" onclick="saveApiKey()">Save Key</button>
+                  <span id="api-key-status" class="api-key-status"></span>
+                </div>
+              </div>
+
+              <div class="step-nav">
+                <button class="btn-secondary" onclick="goStep(3)">← Back</button>
+                <button class="btn-primary" onclick="goStep(5)">Next: Review →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5: Review & Generate -->
+          <div class="step-panel" id="step-panel-5">
+            <div class="panel-card">
+              <h3>Review & Generate</h3>
+
+              <div class="review-grid" id="review-summary"></div>
+
+              <h3 style="margin-top:28px;">Document Sections</h3>
+              <p class="field-hint">Select the sections to include in the generated document.</p>
+              <div class="sections-checklist">
+                <label class="check-item"><input type="checkbox" checked data-section="cover" /> Cover Page</label>
+                <label class="check-item"><input type="checkbox" checked data-section="highlights" /> Investment Highlights</label>
+                <label class="check-item"><input type="checkbox" checked data-section="property" /> Property Details</label>
+                <label class="check-item"><input type="checkbox" checked data-section="photos" /> Property Photos</label>
+                <label class="check-item"><input type="checkbox" checked data-section="location" /> Location & Market Overview</label>
+                <label class="check-item"><input type="checkbox" checked data-section="financials" /> Financial Summary</label>
+                <label class="check-item"><input type="checkbox" checked data-section="rentroll" /> Rent Roll</label>
+                <label class="check-item"><input type="checkbox" checked data-section="tenants" /> Tenant Summary</label>
+                <label class="check-item"><input type="checkbox" checked data-section="valuation" /> Valuation / Pricing Guidance</label>
+                <label class="check-item"><input type="checkbox" checked data-section="disclaimer" /> Disclaimer</label>
+              </div>
+
+              <h3 style="margin-top:28px;">Output Format</h3>
+              <div class="format-options">
+                <label class="radio-item active" id="fmt-html-label">
+                  <input type="radio" name="output-format" value="html" checked onchange="selectFormat(this)" />
+                  <div class="radio-content">
+                    <div class="radio-title">HTML (Print to PDF)</div>
+                    <div class="radio-desc">Generates a styled document you can print or save as PDF from your browser</div>
+                  </div>
+                </label>
+                <label class="radio-item" id="fmt-summary-label">
+                  <input type="radio" name="output-format" value="summary" onchange="selectFormat(this)" />
+                  <div class="radio-content">
+                    <div class="radio-title">Text Summary</div>
+                    <div class="radio-desc">AI-written narrative and financial summary, ready to paste into your template</div>
+                  </div>
+                </label>
+              </div>
+
+              <div id="generate-status" class="generate-status" style="display:none;"></div>
+
+              <div class="step-nav">
+                <button class="btn-secondary" onclick="goStep(4)">← Back</button>
+                <button class="btn-primary btn-generate-final" onclick="generateDocument()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  Generate Document
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /step-panels -->
+      </div><!-- /page-om-builder -->
+
+      <!-- Settings page -->
+      <div class="page" id="page-settings">
+        <div class="page-header">
+          <div>
+            <h1>Settings</h1>
+            <p class="page-subtitle">Configure your portal preferences and API keys</p>
+          </div>
+        </div>
+        <div class="panel-card" style="max-width:600px;">
+          <h3>API Configuration</h3>
+          <div class="form-group full" style="margin-top:16px;">
+            <label>Claude API Key</label>
+            <div class="api-key-row">
+              <input type="password" id="settings-api-key" placeholder="sk-ant-api03-..." style="flex:1;" />
+              <button class="btn-primary" onclick="saveApiKeyFromSettings()">Save</button>
+            </div>
+            <p class="field-hint" style="margin-top:8px;">Your key is stored locally in your browser and never sent anywhere except directly to Anthropic's API.</p>
+          </div>
+          <h3 style="margin-top:28px;">Firm Details</h3>
+          <div class="form-grid" style="margin-top:16px;">
+            <div class="form-group full">
+              <label>Firm Name</label>
+              <input type="text" id="settings-firm" value="Colliers International" />
+            </div>
+            <div class="form-group">
+              <label>Office City</label>
+              <input type="text" id="settings-city" value="Denver, Colorado" />
+            </div>
+            <div class="form-group">
+              <label>Office Phone</label>
+              <input type="text" id="settings-phone" placeholder="(303) 555-0100" />
+            </div>
+            <div class="form-group full">
+              <label>Standard Disclaimer Text</label>
+              <textarea id="settings-disclaimer" rows="4">The information contained herein has been obtained from sources believed to be reliable. While we do not doubt its accuracy, we have not verified it and make no guarantee, warranty, or representation about it. It is your responsibility to independently confirm its accuracy and completeness. Colliers International and its affiliates expressly disclaim any and all liability for representations or warranties, expressed or implied, contained in, or for omissions from, this document or any other written or oral communication transmitted or made available to the recipient.</textarea>
+            </div>
+          </div>
+          <button class="btn-primary" style="margin-top:16px;" onclick="saveSettings()">Save Settings</button>
+        </div>
+      </div>
+
+      <!-- Generated document output -->
+      <div class="page" id="page-output">
+        <div class="page-header">
+          <div>
+            <h1 id="output-title">Generated Document</h1>
+            <p class="page-subtitle" id="output-subtitle"></p>
+          </div>
+          <div class="header-actions">
+            <button class="btn-secondary" onclick="navigate('om-builder')">← Back to Builder</button>
+            <button class="btn-primary" onclick="printDocument()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Print / Save PDF
+            </button>
+          </div>
+        </div>
+        <div id="document-output"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
