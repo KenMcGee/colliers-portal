@@ -3,6 +3,6 @@
   "version": "3.0.0",
   "description": "Colliers Denver Design Studio — CRE Document Portal",
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   }
 }
