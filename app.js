@@ -836,36 +836,50 @@ async function testAPIConnection() {
   const result = document.getElementById('api-test-result');
   btn.disabled = true;
   btn.textContent = 'Testing...';
-  result.textContent = '';
+  result.innerHTML = '';
 
-  // Step 1: check if proxy endpoint is reachable
+  // Step 1: check if Vercel functions are routing at all
   try {
-    const res = await fetch('/api/claude', {
+    const pingRes = await fetch('/api/ping');
+    const pingText = await pingRes.text();
+    let pingData;
+    try { pingData = JSON.parse(pingText); } catch(e) {
+      result.innerHTML = `<span style="color:#cc3333;">✗ <strong>Function routing is broken.</strong> /api/ping returned HTML instead of JSON — Vercel is not recognizing the api/ folder as serverless functions.<br><br>Fix: In Vercel dashboard → your project → Settings → General → set <strong>Framework Preset to "Other"</strong> and <strong>Output Directory to "."</strong> → Save → Redeploy.</span>`;
+      btn.disabled = false; btn.textContent = 'Test API Connection'; return;
+    }
+
+    if (!pingData.ok) {
+      result.innerHTML = `<span style="color:#cc3333;">✗ Ping failed: ${JSON.stringify(pingData)}</span>`;
+      btn.disabled = false; btn.textContent = 'Test API Connection'; return;
+    }
+
+    if (!pingData.hasApiKey) {
+      result.innerHTML = `<span style="color:#cc3333;">✗ Function routing works ✓ but <strong>ANTHROPIC_API_KEY is not set</strong> in Vercel environment variables.<br><br>Fix: Vercel dashboard → your project → Settings → Environment Variables → add ANTHROPIC_API_KEY → Redeploy.</span>`;
+      btn.disabled = false; btn.textContent = 'Test API Connection'; return;
+    }
+
+    // Step 2: ping worked and key exists — now test actual Claude call
+    result.innerHTML = '<span style="color:#b8720a;">⏳ Function routing works, API key found — testing Claude API call...</span>';
+
+    const claudeRes = await fetch('/api/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 20, messages: [{ role: 'user', content: 'Say "ok" and nothing else.' }] }),
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 20, messages: [{ role: 'user', content: 'Say "ok".' }] }),
     });
-    const data = await res.json();
+    const claudeData = await claudeRes.json();
 
-    if (res.status === 500 && data?.error === 'API key not configured on server') {
-      result.innerHTML = '<span style="color:#cc3333;">✗ Proxy reached but <strong>ANTHROPIC_API_KEY</strong> environment variable is not set on Vercel. Add it in Vercel → Settings → Environment Variables, then redeploy.</span>';
-    } else if (res.status === 401) {
-      result.innerHTML = '<span style="color:#cc3333;">✗ Proxy reached but API key is invalid or expired. Check the key value in Vercel environment variables.</span>';
-    } else if (res.status === 404) {
-      result.innerHTML = '<span style="color:#cc3333;">✗ Proxy function not found. Make sure the <code>api/claude.js</code> file was included in your Vercel deployment.</span>';
-    } else if (!res.ok) {
-      result.innerHTML = `<span style="color:#cc3333;">✗ Error ${res.status}: ${data?.error?.message || data?.error || 'Unknown error'}</span>`;
-    } else if (data?.content?.[0]?.text) {
-      result.innerHTML = '<span style="color:#1a7a4a;">✓ API connection working. Claude responded successfully.</span>';
+    if (claudeRes.status === 401) {
+      result.innerHTML = '<span style="color:#cc3333;">✗ API key is invalid or expired. Check the value in Vercel environment variables.</span>';
+    } else if (!claudeRes.ok) {
+      result.innerHTML = `<span style="color:#cc3333;">✗ Claude API error ${claudeRes.status}: ${claudeData?.error?.message || JSON.stringify(claudeData)}</span>`;
+    } else if (claudeData?.content?.[0]?.text) {
+      result.innerHTML = '<span style="color:#1a7a4a;">✓ Everything working — function routing, API key, and Claude API all confirmed.</span>';
     } else {
-      result.innerHTML = `<span style="color:#b8720a;">⚠ Unexpected response format: ${JSON.stringify(data).slice(0, 200)}</span>`;
+      result.innerHTML = `<span style="color:#b8720a;">⚠ Unexpected response: ${JSON.stringify(claudeData).slice(0, 200)}</span>`;
     }
+
   } catch (e) {
-    if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
-      result.innerHTML = '<span style="color:#cc3333;">✗ Could not reach <code>/api/claude</code> — this usually means you\'re running from a local file rather than a server. Open via VS Code Live Server or deploy to Vercel.</span>';
-    } else {
-      result.innerHTML = `<span style="color:#cc3333;">✗ ${e.message}</span>`;
-    }
+    result.innerHTML = `<span style="color:#cc3333;">✗ Network error: ${e.message}. Make sure you are accessing the deployed Vercel URL, not a local file.</span>`;
   }
 
   btn.disabled = false;
