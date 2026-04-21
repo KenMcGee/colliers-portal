@@ -178,7 +178,6 @@ function selectLayout(l) {
 
 // ============ TEMPLATE STYLE EXTRACTION ============
 async function extractTemplateStyle() {
-  if (!state.apiKey) { showToast('Enter your Claude API key in Step 4 first'); return; }
   const files = state.uploadedFiles['template'] || [];
   if (!files.length) { showToast('Upload a template file first'); return; }
   const statusEl = document.getElementById('extract-status-template');
@@ -211,13 +210,7 @@ Return ONLY this JSON, no other text:
 
   try {
     const messages = [{ role: 'user', content: [{ type: 'document', source: { type: 'base64', media_type: mediaType, data: base64 } }, { type: 'text', text: prompt }] }];
-    const res = await fetch('/api/claude', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages })
-    });
-    if (!res.ok) throw new Error('API error');
-    const data = await res.json();
+    const data = await callClaude({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages });
     const text = data.content?.[0]?.text || '';
     const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
 
@@ -239,7 +232,7 @@ Return ONLY this JSON, no other text:
     statusEl.className = 'extract-status ok';
     showToast('Template style applied to Design Settings');
   } catch (e) {
-    statusEl.textContent = '✗ Could not analyze template — check API key';
+    statusEl.textContent = '✗ ' + (e.message || 'Unknown error');
     statusEl.className = 'extract-status err';
   }
 }
@@ -278,14 +271,28 @@ async function readFileAsText(file) {
   return new Promise((res, rej) => { const r = new FileReader(); r.onload = e => res(e.target.result); r.onerror = rej; r.readAsText(file); });
 }
 
+// ============ SHARED API CALL ============
+async function callClaude(body) {
+  const res = await fetch('/api/claude', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const msg = data?.error?.message || data?.error || `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  return data;
+}
+
 // ============ AI EXTRACTION ============
 async function extractFromUpload(type) {
-  if (!state.apiKey) { showToast('Enter your Claude API key in Step 4 first'); return; }
   const statusEl = document.getElementById('extract-status-' + type);
   if (statusEl) statusEl.innerHTML = '<span class="status-spinner" style="display:inline-block;width:11px;height:11px;border:2px solid rgba(0,87,184,0.2);border-top-color:#0057b8;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:5px;vertical-align:middle;"></span>Extracting...';
   const keyMap = { property: 'property-doc', financials: 'financials', narrative: 'narrative' };
   const files = state.uploadedFiles[keyMap[type]] || [];
-  if (!files.length) { if (statusEl) statusEl.textContent = 'No file uploaded.'; return; }
+  if (!files.length) { if (statusEl) { statusEl.textContent = 'No file uploaded.'; statusEl.className = 'extract-status'; } return; }
   let fileContent = '';
   try { fileContent = await readFileAsText(files[0]); } catch (e) { fileContent = `[File: ${files[0].name}]`; }
   let prompt = '';
@@ -301,9 +308,7 @@ Document: ${fileContent.slice(0, 6000)}`;
     prompt = `Summarize key marketing points from this document in 3-4 paragraphs for use as CRE narrative context. Document: ${fileContent.slice(0, 6000)}`;
   }
   try {
-    const res = await fetch('/api/claude', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 2000, messages: [{ role: 'user', content: prompt }] }) });
-    if (!res.ok) throw new Error('API error');
-    const data = await res.json();
+    const data = await callClaude({ model: 'claude-sonnet-4-20250514', max_tokens: 2000, messages: [{ role: 'user', content: prompt }] });
     const text = data.content?.[0]?.text || '';
     if (type === 'narrative') { state.narrativeContext = text; if (statusEl) { statusEl.textContent = '✓ Narrative saved as AI context'; statusEl.className = 'extract-status ok'; } return; }
     const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
@@ -318,7 +323,9 @@ Document: ${fileContent.slice(0, 6000)}`;
       calcFinancials();
     }
     if (statusEl) { statusEl.textContent = type === 'property' ? '✓ Fields populated from document' : '✓ Financials and rent roll populated'; statusEl.className = 'extract-status ok'; }
-  } catch (e) { if (statusEl) { statusEl.textContent = '✗ Extraction failed — check API key'; statusEl.className = 'extract-status err'; } }
+  } catch (e) {
+    if (statusEl) { statusEl.textContent = '✗ ' + (e.message || 'Unknown error'); statusEl.className = 'extract-status err'; }
+  }
 }
 
 // ============ FINANCIALS ============
@@ -443,29 +450,29 @@ async function generateDocument() {
   let ai = {};
   let resolvedFonts = { heading: state.design.fonts.heading || 'Playfair Display', body: state.design.fonts.body || 'Inter', number: state.design.fonts.number || state.design.fonts.heading || 'Playfair Display' };
 
-  if (state.apiKey) {
-    try {
-      // If fonts not chosen, ask AI to pick them based on context
-      if (!state.design.fonts.heading || !state.design.fonts.body) {
-        const fontPrompt = `You are a CRE design director. Pick professional Google Fonts for a ${docTypeLabel} for a ${state.propType} property.
+  try {
+    // If fonts not chosen, ask AI to pick them based on context
+    if (!state.design.fonts.heading || !state.design.fonts.body) {
+      const fontPrompt = `You are a CRE design director. Pick professional Google Fonts for a ${docTypeLabel} for a ${state.propType} property.
 Design palette primary color is ${state.design.colors.primary}, layout style is ${state.design.layout}.
 Return ONLY JSON: {"heading": "font name", "body": "font name", "number": "font name"}
 Choose from: Playfair Display, Merriweather, Lora, Cormorant Garamond, Montserrat, Raleway, Oswald, Inter, DM Sans, Source Sans 3, Lato, Bebas Neue, Barlow`;
-        const fr = await fetch('/api/claude', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 200, messages: [{ role: 'user', content: fontPrompt }] }) });
-        if (fr.ok) {
-          const fd = await fr.json();
-          const fp = JSON.parse((fd.content?.[0]?.text || '{}').replace(/```json|```/g, '').trim());
-          if (fp.heading) resolvedFonts.heading = state.design.fonts.heading || fp.heading;
-          if (fp.body) resolvedFonts.body = state.design.fonts.body || fp.body;
-          if (fp.number) resolvedFonts.number = state.design.fonts.number || fp.number;
-        }
-      }
+      try {
+        const fd = await callClaude({ model: 'claude-sonnet-4-20250514', max_tokens: 200, messages: [{ role: 'user', content: fontPrompt }] });
+        const fp = JSON.parse((fd.content?.[0]?.text || '{}').replace(/```json|```/g, '').trim());
+        if (fp.heading) resolvedFonts.heading = state.design.fonts.heading || fp.heading;
+        if (fp.body) resolvedFonts.body = state.design.fonts.body || fp.body;
+        if (fp.number) resolvedFonts.number = state.design.fonts.number || fp.number;
+      } catch (e) { /* use defaults */ }
+    }
 
-      statusEl.innerHTML = '<span class="status-spinner"></span> Writing document narratives...';
-      const narrativePrompt = buildNarrativePrompt(prop, fin, broker, rentRoll, docTypeLabel);
-      const nr = await fetch('/api/claude', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, messages: [{ role: 'user', content: narrativePrompt }] }) });
-      if (nr.ok) { const nd = await nr.json(); try { ai = JSON.parse((nd.content?.[0]?.text || '{}').replace(/```json|```/g, '').trim()); } catch (e) { ai = {}; } }
-    } catch (e) { /* continue without AI */ }
+    statusEl.innerHTML = '<span class="status-spinner"></span> Writing document narratives...';
+    const narrativePrompt = buildNarrativePrompt(prop, fin, broker, rentRoll, docTypeLabel);
+    const nd = await callClaude({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, messages: [{ role: 'user', content: narrativePrompt }] });
+    try { ai = JSON.parse((nd.content?.[0]?.text || '{}').replace(/```json|```/g, '').trim()); } catch (e) { ai = {}; }
+  } catch (e) {
+    statusEl.innerHTML = `<span style="color:#f5a623;">⚠ AI unavailable (${e.message}) — building document from entered data.</span>`;
+    await new Promise(r => setTimeout(r, 2000));
   }
 
   // Load chosen fonts before rendering
@@ -821,6 +828,48 @@ function refreshDashboard() {
   const container = document.getElementById('recent-projects-list');
   if (!projects.length) { container.innerHTML = `<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>No projects yet.</p><button class="btn-primary" onclick="navigate('om-builder')">Create Document</button></div>`; return; }
   container.innerHTML = `<table class="projects-table"><thead><tr><th>Property</th><th>Type</th><th>Price</th><th>Cap Rate</th><th>SF</th><th>Date</th><th>Status</th></tr></thead><tbody>${projects.map(p => `<tr><td><div style="font-weight:500;">${p.name}</div><div style="font-size:11px;color:var(--text-muted);">${p.address}</div></td><td><span class="doc-type-badge ${p.docType}">${p.docType==='om'?'OM':'BOV'}</span></td><td>${p.price?'$'+fmtNum(p.price):'—'}</td><td>${p.capRate?p.capRate+'%':'—'}</td><td>${p.sf?fmtNum(p.sf)+' SF':'—'}</td><td>${p.createdAt}</td><td><span style="font-size:11px;color:${p.status==='complete'?'#1a7a4a':'#b8720a'};font-weight:500;">${p.status}</span></td></tr>`).join('')}</tbody></table>`;
+}
+
+// ============ API DIAGNOSTIC ============
+async function testAPIConnection() {
+  const btn = document.getElementById('btn-api-test');
+  const result = document.getElementById('api-test-result');
+  btn.disabled = true;
+  btn.textContent = 'Testing...';
+  result.textContent = '';
+
+  // Step 1: check if proxy endpoint is reachable
+  try {
+    const res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 20, messages: [{ role: 'user', content: 'Say "ok" and nothing else.' }] }),
+    });
+    const data = await res.json();
+
+    if (res.status === 500 && data?.error === 'API key not configured on server') {
+      result.innerHTML = '<span style="color:#cc3333;">✗ Proxy reached but <strong>ANTHROPIC_API_KEY</strong> environment variable is not set on Vercel. Add it in Vercel → Settings → Environment Variables, then redeploy.</span>';
+    } else if (res.status === 401) {
+      result.innerHTML = '<span style="color:#cc3333;">✗ Proxy reached but API key is invalid or expired. Check the key value in Vercel environment variables.</span>';
+    } else if (res.status === 404) {
+      result.innerHTML = '<span style="color:#cc3333;">✗ Proxy function not found. Make sure the <code>api/claude.js</code> file was included in your Vercel deployment.</span>';
+    } else if (!res.ok) {
+      result.innerHTML = `<span style="color:#cc3333;">✗ Error ${res.status}: ${data?.error?.message || data?.error || 'Unknown error'}</span>`;
+    } else if (data?.content?.[0]?.text) {
+      result.innerHTML = '<span style="color:#1a7a4a;">✓ API connection working. Claude responded successfully.</span>';
+    } else {
+      result.innerHTML = `<span style="color:#b8720a;">⚠ Unexpected response format: ${JSON.stringify(data).slice(0, 200)}</span>`;
+    }
+  } catch (e) {
+    if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+      result.innerHTML = '<span style="color:#cc3333;">✗ Could not reach <code>/api/claude</code> — this usually means you\'re running from a local file rather than a server. Open via VS Code Live Server or deploy to Vercel.</span>';
+    } else {
+      result.innerHTML = `<span style="color:#cc3333;">✗ ${e.message}</span>`;
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Test API Connection';
 }
 
 // ============ INIT ============

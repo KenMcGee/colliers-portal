@@ -600,6 +600,10 @@
           <strong>API key is configured server-side on Vercel.</strong><br>
           To update: Vercel dashboard → your project → Settings → Environment Variables → update <code style="background:#e0f5ea;padding:1px 5px;border-radius:3px;font-family:monospace;">ANTHROPIC_API_KEY</code> → Redeploy.
         </div>
+        <div style="margin-top:14px;">
+          <button class="btn-secondary" onclick="testAPIConnection()" id="btn-api-test">Test API Connection</button>
+          <div id="api-test-result" style="margin-top:10px;font-size:12px;min-height:18px;"></div>
+        </div>
         <h3 style="margin-top:28px;">Firm Details</h3>
         <div class="form-grid" style="margin-top:16px;">
           <div class="form-group full"><label>Firm Name</label><input type="text" id="settings-firm" value="Colliers International" /></div>
