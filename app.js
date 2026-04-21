@@ -211,9 +211,9 @@ Return ONLY this JSON, no other text:
 
   try {
     const messages = [{ role: 'user', content: [{ type: 'document', source: { type: 'base64', media_type: mediaType, data: base64 } }, { type: 'text', text: prompt }] }];
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/claude', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': state.apiKey, 'anthropic-version': '2023-06-01' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages })
     });
     if (!res.ok) throw new Error('API error');
@@ -301,7 +301,7 @@ Document: ${fileContent.slice(0, 6000)}`;
     prompt = `Summarize key marketing points from this document in 3-4 paragraphs for use as CRE narrative context. Document: ${fileContent.slice(0, 6000)}`;
   }
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': state.apiKey, 'anthropic-version': '2023-06-01' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 2000, messages: [{ role: 'user', content: prompt }] }) });
+    const res = await fetch('/api/claude', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 2000, messages: [{ role: 'user', content: prompt }] }) });
     if (!res.ok) throw new Error('API error');
     const data = await res.json();
     const text = data.content?.[0]?.text || '';
@@ -451,7 +451,7 @@ async function generateDocument() {
 Design palette primary color is ${state.design.colors.primary}, layout style is ${state.design.layout}.
 Return ONLY JSON: {"heading": "font name", "body": "font name", "number": "font name"}
 Choose from: Playfair Display, Merriweather, Lora, Cormorant Garamond, Montserrat, Raleway, Oswald, Inter, DM Sans, Source Sans 3, Lato, Bebas Neue, Barlow`;
-        const fr = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': state.apiKey, 'anthropic-version': '2023-06-01' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 200, messages: [{ role: 'user', content: fontPrompt }] }) });
+        const fr = await fetch('/api/claude', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 200, messages: [{ role: 'user', content: fontPrompt }] }) });
         if (fr.ok) {
           const fd = await fr.json();
           const fp = JSON.parse((fd.content?.[0]?.text || '{}').replace(/```json|```/g, '').trim());
@@ -463,7 +463,7 @@ Choose from: Playfair Display, Merriweather, Lora, Cormorant Garamond, Montserra
 
       statusEl.innerHTML = '<span class="status-spinner"></span> Writing document narratives...';
       const narrativePrompt = buildNarrativePrompt(prop, fin, broker, rentRoll, docTypeLabel);
-      const nr = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': state.apiKey, 'anthropic-version': '2023-06-01' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, messages: [{ role: 'user', content: narrativePrompt }] }) });
+      const nr = await fetch('/api/claude', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, messages: [{ role: 'user', content: narrativePrompt }] }) });
       if (nr.ok) { const nd = await nr.json(); try { ai = JSON.parse((nd.content?.[0]?.text || '{}').replace(/```json|```/g, '').trim()); } catch (e) { ai = {}; } }
     } catch (e) { /* continue without AI */ }
   }

@@ -345,12 +345,10 @@
               <div class="extract-status" id="extract-status-narrative"></div>
             </div>
             <div class="api-key-section" style="margin-top:20px;">
-              <h3>Claude API Key</h3>
-              <p class="field-hint">Required for AI narrative generation and data extraction.</p>
-              <div class="api-key-row">
-                <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." style="flex:1;" />
-                <button class="btn-secondary" onclick="saveApiKey()">Save Key</button>
-                <span id="api-key-status" class="api-key-status"></span>
+              <h3>Claude API</h3>
+              <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;margin-top:8px;">
+                AI features (narrative generation, file extraction) use your Claude API key configured on Vercel. No key entry needed here — it's handled securely server-side.<br>
+                <span style="color:var(--success);">✓ API calls route through <code style="font-size:11px;">/api/claude</code> on your Vercel deployment.</span>
               </div>
             </div>
             <div class="step-nav">
@@ -598,13 +596,9 @@
       </div>
       <div class="panel-card" style="max-width:600px;">
         <h3>API Configuration</h3>
-        <div class="form-group full" style="margin-top:16px;">
-          <label>Claude API Key</label>
-          <div class="api-key-row">
-            <input type="password" id="settings-api-key" placeholder="sk-ant-api03-..." style="flex:1;" />
-            <button class="btn-primary" onclick="saveApiKeyFromSettings()">Save</button>
-          </div>
-          <p class="field-hint" style="margin-top:8px;">Stored locally in your browser. Sent only to Anthropic's API.</p>
+        <div style="background:#f0faf4;border:1px solid #b3dfc7;border-radius:8px;padding:14px 16px;font-size:12px;color:#1a5c38;line-height:1.7;margin-top:16px;">
+          <strong>API key is configured server-side on Vercel.</strong><br>
+          To update: Vercel dashboard → your project → Settings → Environment Variables → update <code style="background:#e0f5ea;padding:1px 5px;border-radius:3px;font-family:monospace;">ANTHROPIC_API_KEY</code> → Redeploy.
         </div>
         <h3 style="margin-top:28px;">Firm Details</h3>
         <div class="form-grid" style="margin-top:16px;">
