@@ -210,7 +210,7 @@ Return ONLY this JSON, no other text:
 
   try {
     const messages = [{ role: 'user', content: [{ type: 'document', source: { type: 'base64', media_type: mediaType, data: base64 } }, { type: 'text', text: prompt }] }];
-    const data = await callClaude({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages });
+    const data = await callClaude({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages });
     const text = data.content?.[0]?.text || '';
     const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
 
@@ -308,7 +308,7 @@ Document: ${fileContent.slice(0, 6000)}`;
     prompt = `Summarize key marketing points from this document in 3-4 paragraphs for use as CRE narrative context. Document: ${fileContent.slice(0, 6000)}`;
   }
   try {
-    const data = await callClaude({ model: 'claude-sonnet-4-20250514', max_tokens: 2000, messages: [{ role: 'user', content: prompt }] });
+    const data = await callClaude({ model: 'claude-sonnet-4-6', max_tokens: 2000, messages: [{ role: 'user', content: prompt }] });
     const text = data.content?.[0]?.text || '';
     if (type === 'narrative') { state.narrativeContext = text; if (statusEl) { statusEl.textContent = '✓ Narrative saved as AI context'; statusEl.className = 'extract-status ok'; } return; }
     const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
@@ -458,7 +458,7 @@ Design palette primary color is ${state.design.colors.primary}, layout style is 
 Return ONLY JSON: {"heading": "font name", "body": "font name", "number": "font name"}
 Choose from: Playfair Display, Merriweather, Lora, Cormorant Garamond, Montserrat, Raleway, Oswald, Inter, DM Sans, Source Sans 3, Lato, Bebas Neue, Barlow`;
       try {
-        const fd = await callClaude({ model: 'claude-sonnet-4-20250514', max_tokens: 200, messages: [{ role: 'user', content: fontPrompt }] });
+        const fd = await callClaude({ model: 'claude-sonnet-4-6', max_tokens: 200, messages: [{ role: 'user', content: fontPrompt }] });
         const fp = JSON.parse((fd.content?.[0]?.text || '{}').replace(/```json|```/g, '').trim());
         if (fp.heading) resolvedFonts.heading = state.design.fonts.heading || fp.heading;
         if (fp.body) resolvedFonts.body = state.design.fonts.body || fp.body;
@@ -468,7 +468,7 @@ Choose from: Playfair Display, Merriweather, Lora, Cormorant Garamond, Montserra
 
     statusEl.innerHTML = '<span class="status-spinner"></span> Writing document narratives...';
     const narrativePrompt = buildNarrativePrompt(prop, fin, broker, rentRoll, docTypeLabel);
-    const nd = await callClaude({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, messages: [{ role: 'user', content: narrativePrompt }] });
+    const nd = await callClaude({ model: 'claude-sonnet-4-6', max_tokens: 4000, messages: [{ role: 'user', content: narrativePrompt }] });
     try { ai = JSON.parse((nd.content?.[0]?.text || '{}').replace(/```json|```/g, '').trim()); } catch (e) { ai = {}; }
   } catch (e) {
     statusEl.innerHTML = `<span style="color:#f5a623;">⚠ AI unavailable (${e.message}) — building document from entered data.</span>`;
@@ -864,7 +864,7 @@ async function testAPIConnection() {
     const claudeRes = await fetch('/api/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 20, messages: [{ role: 'user', content: 'Say "ok".' }] }),
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 20, messages: [{ role: 'user', content: 'Say "ok".' }] }),
     });
     const claudeData = await claudeRes.json();
 
