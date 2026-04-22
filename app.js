@@ -181,35 +181,52 @@ async function extractTemplateStyle() {
   const files = state.uploadedFiles['template'] || [];
   if (!files.length) { showToast('Upload a template file first'); return; }
   const statusEl = document.getElementById('extract-status-template');
-  statusEl.innerHTML = '<span class="status-spinner" style="display:inline-block;width:11px;height:11px;border:2px solid rgba(0,87,184,0.2);border-top-color:#0057b8;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:5px;vertical-align:middle;"></span>Analyzing template style with AI...';
+  statusEl.innerHTML = '<span class="status-spinner" style="display:inline-block;width:11px;height:11px;border:2px solid rgba(0,87,184,0.2);border-top-color:#0057b8;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:5px;vertical-align:middle;"></span>Reading file...';
 
   const file = files[0];
-  let base64 = null;
-  let mediaType = 'application/pdf';
+  const fileSizeMB = (file.size / 1024 / 1024).toFixed(1);
 
-  try {
-    base64 = await fileToBase64(file);
-    mediaType = file.type || 'application/pdf';
-  } catch (e) {
-    statusEl.textContent = '✗ Could not read file'; return;
+  // Vercel hard limit is 4.5MB on request body.
+  // Base64 encoding inflates by ~33%, so safe limit for raw file is ~3MB.
+  // Strategy: for small files send as base64 document; for larger files
+  // extract text content only and describe the file to Claude instead.
+
+  const SAFE_BASE64_LIMIT = 3 * 1024 * 1024; // 3MB raw = ~4MB base64
+
+  let messages;
+
+  if (file.size <= SAFE_BASE64_LIMIT && (file.type === 'application/pdf' || file.name.endsWith('.pdf'))) {
+    // Small PDF — send directly as a document block
+    statusEl.innerHTML = statusEl.innerHTML.replace('Reading file...', 'Sending to AI...');
+    try {
+      const base64 = await fileToBase64(file);
+      messages = [{ role: 'user', content: [
+        { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+        { type: 'text', text: buildStylePrompt() }
+      ]}];
+    } catch (e) {
+      statusEl.textContent = '✗ Could not read file'; return;
+    }
+  } else {
+    // Large file or non-PDF — extract text and describe the file instead.
+    // This keeps the request well under 4.5MB regardless of file size.
+    statusEl.innerHTML = statusEl.innerHTML.replace('Reading file...', 'Extracting text content...');
+    let textContent = '';
+    try {
+      textContent = await readFileAsText(file);
+      // Trim aggressively — we only need enough to understand the design language
+      textContent = textContent.slice(0, 4000);
+    } catch (e) {
+      textContent = `[Could not extract text from ${file.name}]`;
+    }
+
+    const fileDesc = `File name: ${file.name}\nFile type: ${file.type || 'unknown'}\nFile size: ${fileSizeMB}MB\n\nExtracted text content (first 4000 chars):\n${textContent}`;
+    messages = [{ role: 'user', content: `${buildStylePrompt()}\n\nTemplate file description:\n${fileDesc}` }];
   }
 
-  const prompt = `Analyze this document's visual design and return ONLY a JSON object describing its style. Extract:
-- Color palette (primary background color, accent/highlight color, text color, secondary color, rule/divider color)
-- Typography (heading font name if identifiable, body font name, overall style: serif/sans/modern/classic/luxury/minimal)
-- Layout approach: classic (wide content + sidebar), editorial (bold header, single column), magazine (two columns), or minimal (clean whitespace)
-- Overall aesthetic description in 1 sentence
-
-Return ONLY this JSON, no other text:
-{
-  "colors": { "primary": "#hexcode", "secondary": "#hexcode", "accent": "#hexcode", "text": "#hexcode", "bg": "#hexcode", "rule": "#hexcode" },
-  "fonts": { "headingStyle": "serif|sans|display", "bodyStyle": "serif|sans", "suggestedHeading": "font name or empty string", "suggestedBody": "font name or empty string" },
-  "layout": "classic|editorial|magazine|minimal",
-  "aesthetic": "one sentence description"
-}`;
+  statusEl.innerHTML = '<span class="status-spinner" style="display:inline-block;width:11px;height:11px;border:2px solid rgba(0,87,184,0.2);border-top-color:#0057b8;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:5px;vertical-align:middle;"></span>Analyzing design style with AI...';
 
   try {
-    const messages = [{ role: 'user', content: [{ type: 'document', source: { type: 'base64', media_type: mediaType, data: base64 } }, { type: 'text', text: prompt }] }];
     const data = await callClaude({ model: 'claude-sonnet-4-6', max_tokens: 1000, messages });
     const text = data.content?.[0]?.text || '';
     const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
@@ -235,6 +252,24 @@ Return ONLY this JSON, no other text:
     statusEl.textContent = '✗ ' + (e.message || 'Unknown error');
     statusEl.className = 'extract-status err';
   }
+}
+
+function buildStylePrompt() {
+  return `Analyze this document's visual design and return ONLY a JSON object describing its style. Extract:
+- Color palette (primary background color, accent/highlight color, text color, secondary color, rule/divider color)
+- Typography (heading font name if identifiable, body font name, overall style: serif/sans/modern/classic/luxury/minimal)
+- Layout approach: classic (wide content + sidebar), editorial (bold header, single column), magazine (two columns), or minimal (clean whitespace)
+- Overall aesthetic description in 1 sentence
+
+If you cannot determine exact hex colors from the file content, make educated inferences based on the document name, text content, or any color references found. Default to professional CRE colors if nothing is identifiable.
+
+Return ONLY this JSON, no other text:
+{
+  "colors": { "primary": "#hexcode", "secondary": "#hexcode", "accent": "#hexcode", "text": "#hexcode", "bg": "#hexcode", "rule": "#hexcode" },
+  "fonts": { "headingStyle": "serif|sans|display", "bodyStyle": "serif|sans", "suggestedHeading": "font name or empty string", "suggestedBody": "font name or empty string" },
+  "layout": "classic|editorial|magazine|minimal",
+  "aesthetic": "one sentence description"
+}`;
 }
 
 // ============ FILE UPLOADS ============
